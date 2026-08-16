@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warframe Checklist</title>
+<style>
+:root{color-scheme:dark}
+body{margin:0;background:#0d0f14;color:#e8e6e3;font-family:system-ui,sans-serif}
+header{padding:20px;text-align:center}
+h1{margin:0 0 8px;font-size:1.6rem;letter-spacing:2px}
+#stats{color:#9aa0ac;font-size:.9rem}
+#filters{display:flex;gap:8px;justify-content:center;margin:14px 0;flex-wrap:wrap}
+#filters button{background:#1a1e27;color:#9aa0ac;border:1px solid #2a2f3c;border-radius:20px;padding:6px 16px;cursor:pointer;font-size:.85rem}
+#filters button.on{background:#2e3648;color:#fff;border-color:#4a5570}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:16px;max-width:1400px;margin:auto}
+.card{background:#151923;border:1px solid #232837;border-radius:10px;padding:10px;cursor:pointer;text-align:center;transition:transform .15s,border-color .15s;user-select:none}
+.card:hover{transform:translateY(-3px)}
+.card img{width:100%;aspect-ratio:1;object-fit:contain;filter:grayscale(1) brightness(.6);transition:filter .3s}
+.card .nm{font-size:.8rem;margin-top:6px;color:#8a8f9a}
+.card.own{border-color:#d4a843;box-shadow:0 0 12px #d4a84333}
+.card.own img{filter:none}
+.card.own .nm{color:#e8d9a8}
+.tag{font-size:.6rem;text-transform:uppercase;letter-spacing:1px;color:#5a6070}
+.card.own .tag.prime{color:#d4a843}.card.own .tag.proto{color:#6fc3df}
+</style>
+</head>
+<body>
+<header>
+<h1>WARFRAME CHECKLIST</h1>
+<div id="stats"></div>
+<div id="filters">
+<button data-f="all" class="on">Todos</button>
+<button data-f="normal">Normais</button>
+<button data-f="prime">Primes</button>
+<button data-f="proto">Protoframes</button>
+</div>
+</header>
+<div id="grid"></div>
+<script>
+const CDN='https://raw.githubusercontent.com/wfcd/warframe-items/master/data/img/';
+const KEY='wf-owned';
+const owned=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'));
+const grid=document.getElementById('grid');
+const labels={normal:'',prime:'Prime',proto:'Protoframe'};
+let total=0;
+function stats(){document.getElementById('stats').textContent=owned.size+' / '+total+' obtidos';}
+fetch('data.json').then(r=>r.json()).then(DATA=>{
+  total=DATA.length;
+  DATA.forEach(w=>{
+    const c=document.createElement('div');
+    c.className='card'+(owned.has(w.name)?' own':'');
+    c.dataset.cat=w.cat;
+    c.innerHTML='<img loading="lazy" src="'+CDN+w.img+'" alt="'+w.name+'"><div class="nm">'+w.name+'</div><div class="tag '+w.cat+'">'+labels[w.cat]+'</div>';
+    c.onclick=()=>{
+      c.classList.toggle('own');
+      c.classList.contains('own')?owned.add(w.name):owned.delete(w.name);
+      localStorage.setItem(KEY,JSON.stringify([...owned]));
+      stats();
+    };
+    grid.appendChild(c);
+  });
+  stats();
+});
+document.querySelectorAll('#filters button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#filters button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const f=b.dataset.f;
+  document.querySelectorAll('.card').forEach(c=>c.style.display=(f==='all'||c.dataset.cat===f)?'':'none');
+});
+</script>
+</body>
+</html>
