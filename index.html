@@ -41,6 +41,12 @@ h1{margin:0 0 8px;font-size:1.6rem;letter-spacing:2px}
 #calc-out .chip{background:#1a1e27;border:1px solid #2a2f3c;border-radius:6px;padding:4px 10px;white-space:nowrap}
 #calc-out .chip b{color:#e8e6e3;font-weight:600}
 #calc-out .sub{color:#5a6070;font-size:.78rem;margin-top:10px}
+.routes{margin-top:14px;border-top:1px solid #232837;padding-top:10px}
+.rt-h{color:#d4a843;font-size:.85rem;margin-bottom:8px}
+.rt{background:#1a1e27;border:1px solid #2a2f3c;border-radius:8px;padding:8px 12px;margin-bottom:6px;line-height:1.55}
+.rt b{color:#e8e6e3}
+.rt-n{color:#6fc3df;font-size:.78rem}
+.rt-tip{color:#8a8f9a;font-size:.8rem}
 </style>
 </head>
 <body>
@@ -65,6 +71,7 @@ h1{margin:0 0 8px;font-size:1.6rem;letter-spacing:2px}
 <div id="calc-out">—</div>
 </details>
 <div id="grid"></div>
+<script src="farm-data.js"></script>
 <script>
 const CDN='https://raw.githubusercontent.com/wfcd/warframe-items/master/data/img/';
 const KEY='wf-owned', KEYSET='wf-set';
@@ -82,6 +89,24 @@ function stats(){
     owned.size+' / '+DATA.length+' construídos · '+sets.size+' sets em mãos · '+(DATA.length-owned.size-sets.size)+' faltando';
 }
 const fmt=n=>n.toLocaleString('pt-BR');
+function resLoc(r){
+  const g=Object.entries(FARM).filter(([_,v])=>v.res.includes(r)).map(([k])=>k);
+  return g.length?g.join(' · '):null;
+}
+function routesHTML(res){
+  const need=Object.keys(res);
+  const ranked=Object.entries(FARM)
+    .map(([k,v])=>({k,tip:v.tip,cover:need.filter(r=>v.res.includes(r))}))
+    .filter(g=>g.cover.length).sort((a,b)=>b.cover.length-a.cover.length).slice(0,8);
+  const unknown=need.filter(r=>!resLoc(r));
+  if(!ranked.length)return '';
+  return '<div class="routes"><div class="rt-h">🗺️ Melhores rotas — mundos que cobrem mais recursos da lista de uma vez:</div>'+
+    ranked.map(g=>'<div class="rt"><b>'+g.k+'</b> <span class="rt-n">('+g.cover.length+' recursos)</span><br>'+
+      '<span class="rt-tip">'+g.tip+'</span><br>'+
+      g.cover.sort((a,b)=>res[b]-res[a]).map(r=>r+' <b>'+fmt(res[r])+'</b>').join(' · ')+'</div>').join('')+
+    (unknown.length?'<div class="rt-tip" style="margin-top:6px">Sem rota mapeada: '+unknown.join(', ')+' — passe o mouse no chip ou veja o wiki.</div>':'')+
+    '</div>';
+}
 function calc(){
   const scope=document.getElementById('calc-scope').value;
   const items=DATA.map(w=>w.name).filter(n=>!owned.has(n)&&(scope==='all'||sets.has(n)));
@@ -96,7 +121,8 @@ function calc(){
   const out=document.getElementById('calc-out');
   if(!items.length){out.textContent=scope==='set'?'Nenhum item marcado como "set em mãos" — clique 1× num card pra marcar.':'Nada faltando!';return}
   out.innerHTML='<div class="cr">'+items.length+' itens · '+fmt(cr)+' créditos</div>'+
-    '<div class="chips">'+Object.entries(res).sort((a,b)=>b[1]-a[1]).map(([r,q])=>'<div class="chip">'+r+' <b>'+fmt(q)+'</b></div>').join('')+'</div>'+
+    '<div class="chips">'+Object.entries(res).sort((a,b)=>b[1]-a[1]).map(([r,q])=>'<div class="chip" title="'+(resLoc(r)||'confira no wiki')+'">'+r+' <b>'+fmt(q)+'</b></div>').join('')+'</div>'+
+    routesHTML(res)+
     (Object.keys(weap).length?'<div class="sub">Armas-ingrediente necessárias: '+Object.entries(weap).map(([r,q])=>r+(q>1?' ×'+q:'')).join(', ')+'</div>':'')+
     (parts?'<div class="sub">'+fmt(parts)+' peças de drop/relíquia (Neuroptics, Chassis Prime etc.) — não entram na conta de recursos.</div>':'')+
     (semReceita?'<div class="sub">'+semReceita+' itens sem receita de Foundry (quest, mercado ou skin) fora da conta.</div>':'');

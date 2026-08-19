@@ -1,0 +1,28 @@
+// Mapa de farm: grupo/local → melhor nó + recursos que caem lá.
+// Um recurso pode aparecer em mais de um grupo; a rota usa o primeiro que cobrir.
+window.FARM = {
+  'Júpiter': {tip:'Sinai (Setor Sombrio, Defesa) — Themisto (Alad V) pros Neural Sensors', res:['Salvage','Alloy Plate','Hexenon','Neural Sensors','Gorgaricus Spore','Tepa Nodule','Pustulent Cognitive Nodule']},
+  'Saturno': {tip:'Piscinas (Setor Sombrio, Sobrevivência) — Orokin Cell também no Sargas Ruk (Tethys)', res:['Nano Spores','Plastids','Orokin Cell']},
+  'Vênus': {tip:'Malva (Setor Sombrio, Sobrevivência)', res:['Alloy Plate','Polymer Bundle','Circuits','Fieldron Sample']},
+  'Terra': {tip:'Coba (Setor Sombrio, Defesa) — Neurodes também em Lephantis', res:['Ferrite','Rubedo','Neurodes','Detonite Ampule']},
+  'Marte': {tip:'Kadesh (Setor Sombrio, Defesa)', res:['Salvage','Ferrite','Gallium','Morphics','Fieldron Sample']},
+  'Urano': {tip:'Ophelia (Sobrevivência) — Tellurium cai de inimigos de Archwing/Sharkwing', res:['Polymer Bundle','Plastids','Gallium','Tellurium']},
+  'Netuno': {tip:'Kelashin (Setor Sombrio, Sobrevivência)', res:['Nano Spores','Ferrite','Control Module']},
+  'Europa': {tip:'Cholistan/Valefor (Excavação) — única fonte grande de Cryotic junto de Rubedo', res:['Cryotic','Rubedo','Control Module','Morphics']},
+  'Plutão': {tip:'Hieracon (Excavação) — Cryotic + Endo juntos', res:['Alloy Plate','Rubedo','Plastids','Morphics','Cryotic']},
+  'Sedna': {tip:'Sangeru (Setor Sombrio, Sobrevivência) ou Hydron (Defesa, XP junto)', res:['Salvage','Alloy Plate','Detonite Ampule']},
+  'Eris': {tip:'Akkad (Setor Sombrio, Defesa)', res:['Nano Spores','Plastids','Neurodes','Mutagen Sample']},
+  'Void': {tip:'Ani/Aten — ATENÇÃO: Argon Crystal APODRECE em ~24h, farme só na véspera de usar', res:['Argon Crystal','Ferrite','Rubedo','Control Module']},
+  'Fortaleza Kuva': {tip:'Taveuni (Sobrevivência Kuva com sifões)', res:['Kuva']},
+  'Lua': {tip:'Yuvarium/Circulus (Sobrevivência de Conjunção)', res:['Lua Thrax Plasm','Somatic Fibers']},
+  'Railjack': {tip:'destroços e depósitos nas Proximas (o piloto suga com o Vetor de coleta)', res:['Titanium','Carbides','Cubic Diodes','Ticor Plate','Isos','Nullstones','Asterite','Fersteel Alloy','Copernics','Pustrels']},
+  'Cetus (Planícies)': {tip:'bounties do Konzu + mineração (veios vermelhos = gemas) e pesca; Grokdrul/Iradite caem nos acampamentos Grineer', res:['Grokdrul','Iradite','Cetus Wisp','Heart Nyth','Radian Sentirum','Star Crimzian','Radiant Zodian','Marquise Thyst','Tear Azurite','Esher Devar','Nitain Extract','Breath Of The Eidolon','Eidolon Shard','Intact Sentient Core','Exceptional Sentient Core','Condroc Wing','Kuaka Spinal Claw','Tralok Eyes','Murkray Liver','Norg Brain','Sharrac Teeth','Charc Electroplax','Goopolla Spleen','Mortus Horn','Mawfish Bones','Maw Fang','Seriglass Shard','Fish Meat','Fish Oil','Javlok Capacitor']},
+  'Fortuna (Vallis)': {tip:'bounties da Eudico + mineração/pesca; Toroids caem nas bases (Enrichment Labs etc.)', res:['Thermal Sludge','Mytocardia Spore','Hespazym Alloy','Venerdo Alloy','Auroxium Alloy','Axidrol Alloy','Travocyte Alloy','Star Amarast','Marquise Veridos','Goblite Tears','Sola Toroid','Vega Toroid','Calda Toroid','Lazulite Toroid','Crisma Toroid','Gyromag Systems','Atmo Systems','Repeller Systems','Tromyzon Entroplasma','Charamote Sagan Module','Longwinder Lathe Coagulant','Echowinder Anoscopic Sensor','Synathid Ecosynth Analyzer','Scrubber Exa Brain','Tink Dissipator Coil','Waxen Sebum Deposit','Parasitic Tethermaw','Purged Dagonic']},
+  'Deimos (Cambion)': {tip:'bounties da Mãe + mineração/pesca no Cambion Drift; Kavat Genetic Code = escanear kavats ferais', res:['Adramal Alloy','Thaumic Distillate','Stellated Necrathene','Faceted Tiametrite','Cabochon Embolos','Purified Heciphron','Tempered Bapholite','Devolved Namalon','Trapezium Xenorhast','Heart Noctrul','Sporulate Sac','Saturated Muscle Mass','Dendrite Blastoma','Pustulite','Ganglion','Spinal Core Section','Ocular Stem-Root','Scintillant','Kavat Genetic Code','Damaged Necramech Weapon Barrel','Damaged Necramech Weapon Receiver','Damaged Necramech Weapon Stock','Cranial Foremount']},
+  'Sanctum (Deimos)': {tip:'bounties do Sanctum Anatômica + coleta pelo mapa (Vocas nas paredes)', res:['Necracoil','Stela','Echo Voca','Bellow Voca','Shrill Voca','Tasoma Extract','Silphsela','Lamentus','Entrati Lanthorn']},
+  'Zariman': {tip:'bounties dos Fiéis + Voidplumes espalhadas pelo mapa', res:['Entrati Obols','Voidgel Orb','Thrax Plasm','Voidplume Quill','Voidplume Pinion']},
+  'Duviri': {tip:'coleta no mundo aberto (plantas/pedras) + Orowyrm (Pathos Clamp)', res:['Pathos Clamp','Rune Marrow','Connla Sprout','Dracroot','Yao Shrub','Lucent Teroglobe','Saggen Pearl','Nacreous Pebble','Eevani','Ariette Scale','Ferrofungus','Reeking Puffball','Gamma Berry','Spring Popper','Dull Button',"Violet's Bane",'Borica','Fate Pearl']},
+  'Höllvania (1999)': {tip:'missões e bounties de Höllvania; materiais do Uriel/Vinquibus na Descendia (Refratório Escuro)', res:['Efervon Sample','Techrot Chitin','Techrot Motherboard','Höllvanian Pitchweave Fragment','Aggristone','Kovnik','Experimental Arc-Relay','Temporal Dust','Servoris','Laudavi','Agnovidisc','Coprite Alloy','Ueymag']},
+  'Invasões/Clã': {tip:'Invasões (mapa estelar) pagam esses; ou pesquisa nos laboratórios do Dojo', res:['Fieldron','Detonite Injector','Mutagen Mass']},
+  'Especiais': {tip:'Nitain/Forma = loja da Nightwave · Ducats = kiosque do Relay (peças Prime repetidas) · Anomaly Shard = anomalia Sentient (Veil Proxima) · Isoplast = bounties Narmer', res:['Forma','Orokin Ducats','Anomaly Shard','Narmer Isoplast','Mandachord']},
+};
