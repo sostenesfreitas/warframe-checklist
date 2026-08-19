@@ -11,6 +11,8 @@ header{padding:20px;text-align:center}
 h1{margin:0 0 8px;font-size:1.6rem;letter-spacing:2px}
 nav a{color:#6fc3df;text-decoration:none;font-size:.85rem}
 #stats{color:#9aa0ac;font-size:.9rem;margin-top:6px}
+#legend{color:#5a6070;font-size:.78rem;margin-top:4px}
+#legend b{color:#d4a843}#legend i{color:#6fc3df;font-style:normal}
 #filters{display:flex;gap:8px;justify-content:center;margin:14px 0;flex-wrap:wrap}
 #filters button{background:#1a1e27;color:#9aa0ac;border:1px solid #2a2f3c;border-radius:20px;padding:6px 16px;cursor:pointer;font-size:.85rem}
 #filters button.on{background:#2e3648;color:#fff;border-color:#4a5570}
@@ -25,6 +27,19 @@ nav a{color:#6fc3df;text-decoration:none;font-size:.85rem}
 .card.own{border-color:#d4a843;box-shadow:0 0 12px #d4a84333}
 .card.own img{filter:none}
 .card.own .nm{color:#e8d9a8}
+.card.set{border-color:#6fc3df;box-shadow:0 0 12px #6fc3df33}
+.card.set img{filter:none;opacity:.85}
+.card.set .nm{color:#a8d8e8}
+#calc{max-width:1400px;margin:0 auto;padding:0 16px}
+#calc summary{cursor:pointer;color:#d4a843;font-size:.95rem;letter-spacing:1px;padding:8px 0}
+#calc-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 10px;font-size:.85rem;color:#9aa0ac}
+#calc-bar select{background:#1a1e27;color:#e8e6e3;border:1px solid #2a2f3c;border-radius:6px;padding:5px 10px;font:inherit}
+#calc-out{background:#151923;border:1px solid #232837;border-radius:10px;padding:14px;font-size:.88rem}
+#calc-out .cr{color:#d4a843;font-size:1rem;margin-bottom:8px}
+#calc-out .chips{display:flex;flex-wrap:wrap;gap:6px}
+#calc-out .chip{background:#1a1e27;border:1px solid #2a2f3c;border-radius:6px;padding:4px 10px;white-space:nowrap}
+#calc-out .chip b{color:#e8e6e3;font-weight:600}
+#calc-out .sub{color:#5a6070;font-size:.78rem;margin-top:10px}
 </style>
 </head>
 <body>
@@ -32,19 +47,56 @@ nav a{color:#6fc3df;text-decoration:none;font-size:.85rem}
 <h1>WEAPONS CHECKLIST</h1>
 <nav><a href="index.html">← Warframes</a></nav>
 <div id="stats"></div>
+<div id="legend">clique 1× = <i>set/BP em mãos</i> · 2× = <b>construída</b> · 3× = limpa</div>
 <div id="filters"></div>
 </header>
+<details id="calc">
+<summary>📦 Recursos totais para construir</summary>
+<div id="calc-bar">Calcular para: <select id="calc-scope">
+  <option value="set">sets/BPs em mãos (azuis)</option>
+  <option value="all">tudo que falta construir</option>
+</select></div>
+<div id="calc-out">—</div>
+</details>
 <div id="secs"></div>
 <script>
 const CDN='https://raw.githubusercontent.com/wfcd/warframe-items/master/data/img/';
-const KEY='wf-weapons-owned';
+const KEY='wf-weapons-owned', KEYSET='wf-weapons-set';
 const owned=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'));
+const sets=new Set(JSON.parse(localStorage.getItem(KEYSET)||'[]'));
 const CATS=['Primary','Secondary','Melee','Arch-Gun','Arch-Melee'];
 const PT={'Primary':'Primárias','Secondary':'Secundárias','Melee':'Melee','Arch-Gun':'Arch-Guns','Arch-Melee':'Arch-Melees'};
-let total=0;
-function stats(){document.getElementById('stats').textContent=owned.size+' / '+total+' obtidas';}
-fetch('weapons-data.json').then(r=>r.json()).then(DATA=>{
-  total=DATA.length;
+let DATA=[],CRAFT={};
+function save(){
+  localStorage.setItem(KEY,JSON.stringify([...owned]));
+  localStorage.setItem(KEYSET,JSON.stringify([...sets]));
+}
+function stats(){
+  document.getElementById('stats').textContent=
+    owned.size+' / '+DATA.length+' construídas · '+sets.size+' sets em mãos · '+(DATA.length-owned.size-sets.size)+' faltando';
+}
+const fmt=n=>n.toLocaleString('pt-BR');
+function calc(){
+  const scope=document.getElementById('calc-scope').value;
+  const items=DATA.map(w=>w.name).filter(n=>!owned.has(n)&&(scope==='all'||sets.has(n)));
+  let cr=0,parts=0,semReceita=0;const res={},weap={};
+  items.forEach(n=>{
+    const c=CRAFT[n];
+    if(!c){semReceita++;return}
+    cr+=c.c;parts+=c.p;
+    for(const[r,q]of Object.entries(c.r))res[r]=(res[r]||0)+q;
+    for(const[r,q]of Object.entries(c.w))weap[r]=(weap[r]||0)+q;
+  });
+  const out=document.getElementById('calc-out');
+  if(!items.length){out.textContent=scope==='set'?'Nenhuma arma marcada como "set em mãos" — clique 1× num card pra marcar.':'Nada faltando!';return}
+  out.innerHTML='<div class="cr">'+items.length+' armas · '+fmt(cr)+' créditos</div>'+
+    '<div class="chips">'+Object.entries(res).sort((a,b)=>b[1]-a[1]).map(([r,q])=>'<div class="chip">'+r+' <b>'+fmt(q)+'</b></div>').join('')+'</div>'+
+    (Object.keys(weap).length?'<div class="sub">Armas-ingrediente necessárias: '+Object.entries(weap).map(([r,q])=>r+(q>1?' ×'+q:'')).join(', ')+'</div>':'')+
+    (parts?'<div class="sub">'+fmt(parts)+' peças de drop/relíquia — não entram na conta de recursos.</div>':'')+
+    (semReceita?'<div class="sub">'+semReceita+' armas sem receita de Foundry (mercado, sindicato, lich, quest ou evento) fora da conta.</div>':'');
+}
+Promise.all([fetch('weapons-data.json').then(r=>r.json()),fetch('craft-data.json').then(r=>r.json()).catch(()=>({}))]).then(([D,C])=>{
+  DATA=D;CRAFT=C;
   const secs=document.getElementById('secs');
   CATS.forEach(cat=>{
     const items=DATA.filter(w=>w.cat===cat);
@@ -56,20 +108,20 @@ fetch('weapons-data.json').then(r=>r.json()).then(DATA=>{
     grid.className='grid';
     items.forEach(w=>{
       const c=document.createElement('div');
-      c.className='card'+(owned.has(w.name)?' own':'');
+      c.className='card'+(owned.has(w.name)?' own':sets.has(w.name)?' set':'');
       c.innerHTML='<img loading="lazy" src="'+CDN+w.img+'" alt="'+w.name+'"><div class="nm">'+w.name+'</div>';
       c.onclick=()=>{
-        c.classList.toggle('own');
-        c.classList.contains('own')?owned.add(w.name):owned.delete(w.name);
-        localStorage.setItem(KEY,JSON.stringify([...owned]));
-        stats();
+        if(owned.has(w.name)){owned.delete(w.name);c.classList.remove('own');}
+        else if(sets.has(w.name)){sets.delete(w.name);owned.add(w.name);c.classList.remove('set');c.classList.add('own');}
+        else{sets.add(w.name);c.classList.add('set');}
+        save();stats();calc();
       };
       grid.appendChild(c);
     });
     sec.appendChild(grid);
     secs.appendChild(sec);
   });
-  stats();
+  stats();calc();
   const filters=document.getElementById('filters');
   ['all',...CATS].forEach(f=>{
     const b=document.createElement('button');
@@ -84,6 +136,7 @@ fetch('weapons-data.json').then(r=>r.json()).then(DATA=>{
     filters.appendChild(b);
   });
 });
+document.getElementById('calc-scope').onchange=calc;
 </script>
 </body>
 </html>
